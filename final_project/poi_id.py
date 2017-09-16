@@ -69,10 +69,8 @@ my_dataset = data_dict
 
 ### features_list is a list of strings, each of which is a feature name
 ### first feature must be "poi", as this will be singled out as the label
-features_list = ["poi", "fraction_from_poi_email", "fraction_to_poi_email", 'shared_receipt_with_poi', 
-'salary', 'deferral_payments', 'total_payments', 'loan_advances', 'bonus', 'restricted_stock_deferred', 
-'deferred_income', 'total_stock_value', 'expenses', 'exercised_stock_options', 'other', 'long_term_incentive', 
-'restricted_stock', 'director_fees'] 
+features_list = ["poi", "fraction_from_poi_email", "fraction_to_poi_email", 'shared_receipt_with_poi',
+'exercised_stock_options','bonus','total_stock_value'] 
 
 ### these two lines extract the features specified in features_list
 ### and extract them from data_dict, returning a numpy array
@@ -123,8 +121,6 @@ clf_set = {
     "Naive_Bayes": clf_nb,
     "Support_Vector_Machine": clf_svm}
 
-max_index = 0
-best_accuracy = 0
 print ("ACCURACY\tPRECISION\tRECALL\tF1_SCORE")
 for i, (clf_name, clf) in enumerate(clf_set.items()):
     print "Classifier: ", clf_name
@@ -134,10 +130,8 @@ for i, (clf_name, clf) in enumerate(clf_set.items()):
     precision = precision_score(labels_test,pred)
     recall = recall_score(labels_test,pred)
     f1score = f1_score(labels_test,pred)
-    if f1score > best_accuracy:
-        best_accuracy = f1score
-        max_index = i
     print("%0.4f\t\t%0.4f\t\t%0.4f\t" % (accuracy,precision,recall))
+clf = clf_svm
 
 ### use KFold for split and validate algorithm
 from sklearn.cross_validation import KFold
@@ -149,13 +143,13 @@ for train_indices, test_indices in kf:
     labels_train=[labels[ii] for ii in train_indices]
     labels_test=[labels[ii] for ii in test_indices]
 
-    clf = tree.DecisionTreeClassifier()
+    #clf = tree.DecisionTreeClassifier()
     clf.fit(features_train,labels_train)
     score = clf.score(features_test,labels_test)
     print("Mean accuracy before tuning %f"% score)
 
     ### use manual tuning parameter min_samples_split
-    clf = tree.DecisionTreeClassifier(min_samples_split=best_split)
+    #clf = tree.DecisionTreeClassifier(min_samples_split=best_split)
     clf = clf.fit(features_train,labels_train)
     pred= clf.predict(features_test)
     acc=accuracy_score(labels_test, pred)

@@ -1,5 +1,5 @@
-#Maching learning for identifying Enron Employees who may have committed fraud 
-#based on the public Enron financial and email dataset.
+# Maching learning for identifying Enron Employees who may have committed fraud 
+# based on the public Enron financial and email dataset.
 import sys
 import pickle
 from sklearn import preprocessing
@@ -58,7 +58,7 @@ fraction_from_poi_email=dict_to_list("from_poi_to_this_person", "to_messages")
 fraction_to_poi_email=dict_to_list("from_this_person_to_poi", "from_messages")
 
 ### insert new features into data_dict
-count=0
+count = 0
 for i in data_dict:
     data_dict[i]["fraction_from_poi_email"]=fraction_from_poi_email[count]
     data_dict[i]["fraction_to_poi_email"]=fraction_to_poi_email[count]
@@ -76,17 +76,15 @@ features_list = ["poi", "fraction_from_poi_email", "fraction_to_poi_email", 'sha
 ### and extract them from data_dict, returning a numpy array
 data = featureFormat(my_dataset, features_list)
 
-### split into labels and features (this line assumes that the first
-### feature in the array is the label, which is why "poi" must always
-### be first in features_list
+### split into labels and features
 labels, features = targetFeatureSplit(data)
 
 ### deploying feature selection
 from sklearn import cross_validation
 features_train, features_test, labels_train, labels_test = cross_validation.train_test_split(features, labels, test_size=0.1, random_state=42)
 
-### Compare Decision Tree Classifier vs. Naive Bayes vs. SVM
-#Decision Tree
+### Compare SVM vs. Decision Tree Classifier vs. Naive Bayes
+# Decision Tree
 ### Determine optimal minimum_split for Decision Tree Classifer
 print ("SPLIT\tACCURACY\tPRECISION\tRECALL")
 best_split = 0
@@ -103,7 +101,7 @@ for i in range (2,10):
         best_split = i
     print("%d\t%0.4f\t\t%0.4f\t\t%0.4f\t" % (i,accuracy,precision,recall))
 clf_tree = tree.DecisionTreeClassifier(min_samples_split=best_split)
-#SVM
+# SVM
 print "Fitting the classifier to the training set"
 param_grid = {
          'C': [1e3, 5e3, 1e4, 5e4, 1e5],
@@ -113,7 +111,7 @@ clf_svm = GridSearchCV(svm.SVC(kernel='rbf', class_weight='balanced'), param_gri
 clf_svm = clf_svm.fit(features_train, labels_train)
 print "Best estimator found by grid search:"
 print clf_svm.best_estimator_
-#Naive Bayes
+# Naive Bayes
 clf_nb=GaussianNB()
 
 clf_set = {
@@ -137,19 +135,17 @@ clf = clf_svm
 from sklearn.cross_validation import KFold
 kf=KFold(len(labels),3)
 for train_indices, test_indices in kf:
-    #make training and testing sets
+    # make training and testing sets
     features_train= [features[ii] for ii in train_indices]
     features_test= [features[ii] for ii in test_indices]
     labels_train=[labels[ii] for ii in train_indices]
     labels_test=[labels[ii] for ii in test_indices]
 
-    #clf = tree.DecisionTreeClassifier()
     clf.fit(features_train,labels_train)
     score = clf.score(features_test,labels_test)
     print("Mean accuracy before tuning %f"% score)
 
     ### use manual tuning parameter min_samples_split
-    #clf = tree.DecisionTreeClassifier(min_samples_split=best_split)
     clf = clf.fit(features_train,labels_train)
     pred= clf.predict(features_test)
     acc=accuracy_score(labels_test, pred)
